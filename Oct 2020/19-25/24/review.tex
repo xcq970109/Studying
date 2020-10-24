@@ -1,0 +1,148 @@
+\documentclass[a4paper,9pt]{scrartcl}
+
+\setlength{\oddsidemargin}{0.25 in}
+\setlength{\evensidemargin}{-0.25 in}
+\setlength{\topmargin}{-0.6 in}
+\setlength{\textwidth}{6.5 in}
+\setlength{\textheight}{5.5 in}
+\setlength{\headsep}{0.75 in}
+\setlength{\parindent}{0 in}
+\setlength{\parskip}{0.1 in}
+
+\usepackage{amssymb, amsmath} % needed for math
+\usepackage[utf8]{inputenc}   % this is needed for umlauts
+\usepackage[USenglish]{babel} % this is needed for umlauts
+\usepackage[T1]{fontenc}      % this is needed for correct output of umlauts in pdf
+\usepackage[margin=2.5cm]{geometry} %layout
+\usepackage{hyperref}         % hyperlinks
+\usepackage{color}
+\usepackage{framed}
+\usepackage{enumerate}  % for advanced numbering of lists
+\usepackage{csquotes}   % for enquote
+
+\newcommand\titletext{Paper-Review of\\"PAC learning with stable and private predictions"}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newenvironment{proof}{{\bf Proof:}}{\hfill\rule{2mm}{2mm}}
+
+\title{\titletext}
+\author{Linbin Yang, Chaoqi Xu}
+
+\hypersetup{
+  pdfauthor   = {Martin Thoma},
+  pdfkeywords = {peer review},
+  pdftitle    = {Lineare Algebra}
+}
+
+\usepackage{microtype}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+This is a peer-review of \enquote{PAC learning with stable and private predictions} by Yuval Dagan and Vitaly Feldman. The reviewed document
+is available under \href{https://sci-hub.im/https://arxiv.org/abs/1911.10541}{https://sci-hub.im/https://arxiv.org/abs/1911.10541}.
+
+\section{Contribution}
+
+Describe the main contribution of this paper.
+
+\section{Preliminary}
+
+\begin{lemma}
+    For any $\epsilon, \alpha, \beta$ and $H$, there exists an $(\alpha, \beta)$-PAC learner with $\epsilon$-private prediction $A_{\epsilon, \alpha, H}^{R}$ for distributions realizable by $H$ with sample complexity of $n = \tilde O(d/(\alpha \epsilon))$.
+\end{lemma}
+
+\begin{lemma}
+    Let $A^\prime$ be an algorithm operating on a sample of size $n^\prime = \eta n$ for $\eta \in (0, 1)$ and let $A$ be the following algorithm that receives a sample of size $n$:
+    \begin{itemize}
+        \item Select a uniformly random subset $T \subseteq S$ of size $n^\prime$.
+        \item Run $A^\prime$ on $T$.
+    \end{itemize}
+    For any $\epsilon \in (0, 1)$, if $A^{'}$ gives $\epsilon$-private prediction then $A$ gives $2\epsilon \eta$-private prediction.
+\end{lemma}
+
+\begin{lemma}
+    Let $D$ be a distribution over $X \times Y$, fix $\alpha, \beta \in (0,1)$, and let $U$ be a set of $n^{'} = O((dlog(1/alpha) + log(1/\beta))/\alpha)$ i.i.d. samples from $D$. Then, with probability at least $1-\beta$, $U$ is an $\alpha$-net for $H$ with respect to $D$.
+\end{lemma}
+
+\section{Uniform Stability of PAC Learning}
+
+Todo
+
+\section{PAC Learning with Prediction Privacy}
+
+Next we would show an algorithm that can PAC learn an arbitrary class $H$ of $VC$ dimension $d$ with the optimal dependence of the sample complexity on $\epsilon$ and $\alpha$. I.e., give proof for Theorem 3.
+The algorithm that achieves the claimed sampled complexity os described below:
+
+\begin{itemize}
+    \item First, we draw a random subset $T \subseteq S$ and then use the exponential mechanism to select a hypothesis $\tilde h \in H_T$. $T$ is of size $|T| = O(\epsilon|S|)$ and the privacy parameter of the exponential mechanism is now set to be $min(\epsilon/2, d/(\alpha|S|))$.
+    \item Second, $\varphi(\tilde h)$  is used to privatized $\tilde h$:
+    \begin{itemize}
+        \item Let $S_{\tilde h}$ denote the set of examples obtained by labeling the points in $S$ with $\tilde h$, $S_{\tilde h} := \{(x, \tilde h(x)): (x, y) \in S\}$. 
+        \item Feed $S_{\tilde h}$ to the PAC learner for the realizable setting with private prediction and we denote the output hypothesis as $\varphi(\tilde h)$. The privacy guarantee of this realizable learner is set to $d/(\alpha|S|)$ and the approximation guarantee is $O(\alpha)$. Note that given $\tilde h$, the hypothesis $\varphi (\tilde h)$ is randomly selected. 
+        \item Given a point $x \in X$, predict $\varphi(\tilde h)(x)$.
+    \end{itemize}
+\end{itemize}
+
+Note that since $S_{\tilde h}$ is realized by $\tilde h$, then $\varphi (\tilde h)$ is very close to $\tilde h$, i.e., $Pr_{(x, y) \sim D}[\tilde h(x) \not= \varphi(\tilde h)(x)] \le O(\alpha)$.
+
+To begin with, the algorithm is an $(\alpha, \beta)$-PAC learning algorithm. As in the analysis of the stable algorithm, $E[L_D(\tilde h)] \le inf_{h \in H} L_D(h) + O(\alpha)$. By the guarantees of the PAC learner for the realizable case we get that $E[L_D(\varphi (\tilde h))] \le L_D(\tilde h) + O(\alpha) \le inf_{h \in H}L_D(h) + O(\alpha)$.
+
+Then we explain why the algorithm gives $\epsilon$-private prediction.i.e., we want to prove that:
+
+\begin{equation}
+    Pr_{T \subseteq S, h_{S, T}}[h_{S, T}(s) = y] \le e^{\epsilon} Pr_{T^\prime \subseteq S^\prime, h_{S^\prime, T^\prime}}[h_{S^\prime, T^\prime}(x) = y] \label{4.1}
+\end{equation}
+
+The IEq \ref{4.1} above can be split in two:
+
+\begin{equation}
+    Pr_{T \subseteq S, h_{S, T}}[h_{S, T}(s) = y] \le e^{\epsilon / 2} Pr_{T^\prime \subseteq S^\prime, h_{S, T^\prime}}[h_{S, T^\prime}(x) = y] \label{4.2}
+\end{equation}
+
+\begin{equation}
+    Pr_{T^\prime \subseteq S^\prime, h_{S, T^\prime}}[h_{S, T^\prime}(x) = y] \le e^{\epsilon / 2} Pr_{T^\prime \subseteq S^\prime, h_{S^\prime, T^\prime}}[h_{S^\prime, T^\prime}(x) = y] \label{4.3}
+\end{equation}
+
+The IEq \ref{4.3} follows from the fact that for any fixed $T^\prime$, $h_{S, T^\prime}(x)$ is the composition of two private algorithms: first, the exponential mechanism selects $\tilde h$ privately, and then $\varphi (\tilde h)(x)$ is a private prediction given any fixed $\tilde h$.
+
+The terms in both sides of the IEq \ref{4.2} can be calculated as follows: first $T$ and $T^\prime$ are randomly drawn as subsets of $S$ and $S^\prime$, respectively. Then, the random predictions $h_{S, T}(x)$ and $h_{S, T^\prime}(x)$ are made. Due to this structure, we can use privacy amplification by sub-sampling (Lemma 3.1) to compare $h_{S,T}(x)$ with $h_{S, T^\prime}(x)$. In particular, we prove that $h_{S, T}(x)$ is $O(1)$-private as a function of $T$, and since $|T| = O(\epsilon |S|)$, the subsampling boosts the privacy by a factor of $O(\epsilon)$ and IEq \ref{4.2}follows. Hence it suffices to show that $h_{S, T}(x)$ is $O(1)$-private as a function of $T$:
+
+\begin{equation}
+    Pr_{h_{S, T}}[h_{S, T}(x) = y] \le e^{O(1)} Pr_{h_{S, T^\prime}}[h_{S, T^\prime}(x) = y] \label{4.4}
+\end{equation}
+
+for any $T$ and $T^\prime$ that differ on one element.
+
+To prove \ref{4.4}, we fix $T$ and $T^\prime$ that differ in one element and create a matching between the elements of $H_T$ and the elements of $H_{T^\prime}$, such that for any matched pair $h \in H_T$ and $h^\prime \in H_{T^\prime}$, the following two properties hold:
+
+\begin{enumerate}
+    \item $|L_S(h) - L_S(h^\prime)| \le \alpha/d$ \label {proper1}
+    \item For any $x \in X$ and $y \in Y$, $Pr[\varphi(h)(x) = y] \le e^{O(1)}Pr[\varphi(h^\prime)(x) = y]$, where the probability is over the random selections of $\varphi (h)$ and $\varphi (h^\prime)$. \label {proper2}
+\end{enumerate}
+
+These two properties imply that $Pr[h_{S, T}(x) = y]$ is within constant factors of $Pr[h_{S, T^\prime}(x) = y]$, and it remains to decsribe why they hold:
+
+\begin{itemize}
+    \item First, define the aforementioned matching between $H_T$ and $H_{T^\prime}$: $h \in H_T$ is matched with $h^\prime \in H_{T^\prime}$ if and only if $h(x) = h^\prime(x)$ for all $(x, y) \in T \bigcap T^\prime$.
+    \item We apply Lemma 3.2 on $\eta$-nets, substituting $U = T \bigcap T^\prime$ and $\eta = \alpha / d$. We obtain that $T \bigcap T^\prime$ is an $\alpha/d$-net for $H$ with respect to the uniform distribution over $S$ (with high probability over a random selection of $T$). Any pair of matched hypotheses satisfy $h(x) = h^\prime(x)$ for all $(x, y) \in T \bigcap T^\prime$, hence, by definition of $\eta$-nets, they satisfy:
+    \begin{equation}
+        |\{(x, y) \in S: h(x) \not= h^\prime(x)\}| \le |S|\alpha/d \label{4.5}
+    \end{equation}
+\end{itemize}
+
+\begin{itemize}
+    \item IEq \ref{4.5} suffices to show property \ref{proper1}.
+    \item For property \ref{proper2}, recall that $\varphi(h)$ is the output of a learner with $d/(\alpha |S|)$-private prediction, trained on $\{(x, h(x)): (x, y) \in S\}$. IEq \ref{4.5} implies that the training sets used to train $\varphi (h)$ and $\varphi (h^\prime)$ differ on at most $\alpha |S|/d$ examples. Applying the privacy guarantee $\alpha |S|/d$ times, one obtains that $Pr[\varphi(h)(x) = y] \le (e^{d/(\alpha |S|)})^{\alpha |S| /d} Pr[\varphi(h^\prime)(x) = y] = ePr[\varphi(h^\prime)(x) = y]$, as required. The property \ref{proper2} holds.
+\end{itemize}
+
+\section{Advatage and Disadvantage}
+
+Todo
+
+\end{document}
